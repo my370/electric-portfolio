@@ -3,8 +3,13 @@ const session = require("express-session");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 const PORT = process.env.PORT || 3000;
 
 const ADMIN_PASSWORD =
@@ -28,21 +33,7 @@ if (!fs.existsSync(dataFile)) {
 }
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-      const ext = path.extname(file.originalname).toLowerCase();
-      const safeExt = ext || ".bin";
-      cb(
-        null,
-        Date.now() + "_" +
-        Math.random().toString(36).substring(2, 10) +
-        safeExt
-      );
-    }
-  }),
+  storage: multer.memoryStorage(),
 
   limits: {
     fileSize: 10 * 1024 * 1024
@@ -225,19 +216,31 @@ function requireAdmin(req, res, next) {
 // PORTFOLIO DATA API
 // ===============================
 
-// Public portfolio needs to read this data
-app.get("/api/portfolio", (req, res) => {
+// Public portfolio reads from Supabase
+app.get("/api/portfolio", async (req, res) => {
 
   try {
 
-    const raw = fs.readFileSync(dataFile, "utf8");
-    const data = JSON.parse(raw || "{}");
+    const { data: rows, error } = await supabase
+      .from("portfolio")
+      .select("data")
+      .order("id", { ascending: true })
+      .limit(1);
+
+    if (error) {
+      throw error;
+    }
+
+    const data =
+      rows && rows.length > 0
+        ? rows[0].data
+        : {};
 
     res.json(data);
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Supabase read error:", error);
 
     res.status(500).json({
       error: "Could not read portfolio data"
@@ -248,15 +251,49 @@ app.get("/api/portfolio", (req, res) => {
 });
 
 
-app.post("/api/portfolio", requireAdmin, (req, res) => {
+app.post("/api/portfolio", requireAdmin, async (req, res) => {
 
   try {
 
-    fs.writeFileSync(
-      dataFile,
-      JSON.stringify(req.body, null, 2),
-      "utf8"
-    );
+    const { data: rows, error: readError } = await supabase
+      .from("portfolio")
+      .select("id")
+      .order("id", { ascending: true })
+      .limit(1);
+
+    if (readError) {
+      throw readError;
+    }
+
+    if (!rows || rows.length === 0) {
+
+      const { error: insertError } = await supabase
+        .from("portfolio")
+        .insert({
+          data: req.body
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+    } else {
+
+      const rowId = rows[0].id;
+
+      const { error: updateError } = await supabase
+        .from("portfolio")
+        .update({
+          data: req.body,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", rowId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+    }
 
     res.json({
       success: true
@@ -264,7 +301,7 @@ app.post("/api/portfolio", requireAdmin, (req, res) => {
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Supabase save error:", error);
 
     res.status(500).json({
       success: false,
@@ -284,34 +321,81 @@ app.post(
   "/api/images",
   requireAdmin,
   upload.single("image"),
-  (req, res) => {
+  async (req, res) => {
 
-    if (!req.file) {
+    try {
 
-      return res.status(400).json({
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: "No image uploaded"
+        });
+      }
+
+      const ext =
+        path.extname(req.file.originalname).toLowerCase() ||
+        ".jpg";
+
+      const filePath =
+        "portfolio/" +
+        Date.now() +
+        "_" +
+        Math.random().toString(36).substring(2, 10) +
+        ext;
+
+      const { error } = await supabase
+        .storage
+        .from("portfolio-images")
+        .upload(
+          filePath,
+          req.file.buffer,
+          {
+            contentType: req.file.mimetype,
+            upsert: false
+          }
+        );
+
+      if (error) {
+        console.error("Supabase Storage upload error:", error);
+
+        return res.status(500).json({
+          success: false,
+          error: "Image upload failed"
+        });
+      }
+
+      const { data: publicData } =
+        supabase
+          .storage
+          .from("portfolio-images")
+          .getPublicUrl(filePath);
+
+      res.json({
+        success: true,
+        filename: publicData.publicUrl
+      });
+
+    } catch (error) {
+
+      console.error("Image upload error:", error);
+
+      res.status(500).json({
         success: false,
-        error: "No image uploaded"
+        error: "Image upload failed"
       });
 
     }
-
-    res.json({
-      success: true,
-      filename: req.file.filename
-    });
 
   }
 );
 
 
 // ===============================
-// IMAGE SERVING
+// OLD LOCAL IMAGE SERVING
 // ===============================
 
-app.use(
-  "/uploads",
-  express.static(uploadDir)
-);
+// Kept temporarily for old local images.
+// New images are stored in Supabase Storage.
 
 
 // ===============================

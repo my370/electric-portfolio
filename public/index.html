@@ -962,6 +962,375 @@ footer a{
 }
 </style>
 
+
+<style>
+/* ===== MODERN PORTFOLIO V2 ===== */
+
+:root{
+  --bg:#050b16;
+  --bg2:#081426;
+  --card:rgba(12,25,45,.72);
+  --line:rgba(62,154,255,.20);
+  --blue:#18a8ff;
+  --cyan:#00d9ff;
+  --text:#f4f8ff;
+  --muted:#91a4bd;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  background:
+    radial-gradient(circle at 10% 10%,rgba(0,174,255,.10),transparent 30%),
+    radial-gradient(circle at 90% 20%,rgba(48,96,255,.10),transparent 28%),
+    radial-gradient(circle at 50% 90%,rgba(0,200,255,.06),transparent 35%),
+    var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* subtle background grid */
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  opacity:.22;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+
+/* navbar */
+
+nav,
+.navbar{
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  background:rgba(5,11,22,.72)!important;
+  border-bottom:1px solid rgba(60,150,255,.12);
+}
+
+/* main container */
+
+.container{
+  max-width:1180px;
+  padding-left:20px;
+  padding-right:20px;
+}
+
+/* cards */
+
+.card{
+  background:
+    linear-gradient(145deg,
+      rgba(15,32,57,.82),
+      rgba(7,18,34,.78))!important;
+  border:1px solid var(--line);
+  border-radius:26px;
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.025);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(24,168,255,.38);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.38),
+    0 0 35px rgba(0,174,255,.06);
+}
+
+/* hero */
+
+.hero{
+  min-height:560px;
+  gap:50px;
+}
+
+.hero h1{
+  letter-spacing:-2px;
+  text-shadow:0 0 35px rgba(0,200,255,.12);
+}
+
+.hero h1 span{
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.hero h2{
+  color:#d9eaff;
+}
+
+.hero p{
+  line-height:1.8;
+  font-size:16px;
+}
+
+/* availability badge */
+
+.badge{
+  background:rgba(0,200,255,.07);
+  border:1px solid rgba(0,200,255,.25);
+  box-shadow:0 0 25px rgba(0,200,255,.06);
+}
+
+/* profile */
+
+.photo-area{
+  position:relative;
+}
+
+.photo-area::before{
+  content:"";
+  position:absolute;
+  width:280px;
+  height:280px;
+  border-radius:50%;
+  background:rgba(0,200,255,.12);
+  filter:blur(55px);
+  z-index:-1;
+}
+
+.profile{
+  width:min(350px,78vw);
+  border-radius:32px;
+  border:1px solid rgba(0,210,255,.35);
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.45),
+    0 0 45px rgba(0,174,255,.10);
+  transition:transform .4s ease,box-shadow .4s ease;
+}
+
+.profile:hover{
+  transform:translateY(-7px) scale(1.015);
+  box-shadow:
+    0 35px 90px rgba(0,0,0,.5),
+    0 0 55px rgba(0,200,255,.16);
+}
+
+/* section headings */
+
+.title{
+  font-size:clamp(28px,4vw,38px);
+  letter-spacing:-.7px;
+  margin-bottom:24px;
+}
+
+/* grids */
+
+.grid{
+  gap:20px;
+}
+
+/* service/project cards */
+
+.item{
+  background:rgba(8,20,37,.72);
+  border:1px solid rgba(67,143,210,.16);
+  border-radius:22px;
+  padding:22px;
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+}
+
+.item:hover{
+  transform:translateY(-6px);
+  border-color:rgba(0,200,255,.32);
+  box-shadow:0 20px 50px rgba(0,0,0,.30);
+}
+
+/* project images */
+
+.project-image{
+  width:100%;
+  aspect-ratio:16/10;
+  object-fit:cover;
+  border-radius:17px;
+  border:1px solid rgba(0,200,255,.14);
+  margin-bottom:16px;
+  transition:transform .4s ease,filter .4s ease;
+}
+
+.item:hover .project-image{
+  transform:scale(1.015);
+}
+
+/* buttons */
+
+.btn{
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  border-color:rgba(0,200,255,.4);
+}
+
+.primary{
+  background:linear-gradient(135deg,#168cff,#00d9ff)!important;
+  box-shadow:0 8px 25px rgba(0,174,255,.16);
+}
+
+.primary:hover{
+  box-shadow:0 12px 32px rgba(0,174,255,.25);
+}
+
+/* links */
+
+a{
+  transition:color .2s ease;
+}
+
+/* contact */
+
+.contact-box{
+  background:rgba(8,20,37,.70)!important;
+  border:1px solid rgba(67,143,210,.16)!important;
+  border-radius:18px!important;
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    background .25s ease;
+}
+
+.contact-box:hover{
+  transform:translateY(-4px);
+  border-color:rgba(0,200,255,.32)!important;
+  background:rgba(10,29,51,.82)!important;
+}
+
+/* social buttons */
+
+.social{
+  border:1px solid rgba(67,143,210,.20);
+  background:rgba(8,20,37,.65);
+  border-radius:12px;
+  padding:10px 14px;
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    background .2s ease;
+}
+
+.social:hover{
+  transform:translateY(-3px);
+  border-color:rgba(0,200,255,.38);
+  background:rgba(0,174,255,.07);
+}
+
+/* forms/editor */
+
+input,
+textarea,
+select{
+  background:rgba(4,13,26,.78)!important;
+  border-color:rgba(67,143,210,.22)!important;
+  border-radius:12px!important;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:rgba(0,200,255,.55)!important;
+  box-shadow:0 0 0 3px rgba(0,200,255,.08)!important;
+  outline:none;
+}
+
+/* section spacing */
+
+section{
+  scroll-margin-top:90px;
+}
+
+/* mobile */
+
+@media(max-width:800px){
+
+  .container{
+    padding-left:15px;
+    padding-right:15px;
+  }
+
+  .hero{
+    grid-template-columns:1fr;
+    min-height:auto;
+    gap:35px;
+    text-align:center;
+    padding-top:35px;
+    padding-bottom:35px;
+  }
+
+  .hero p{
+    margin-left:auto;
+    margin-right:auto;
+  }
+
+  .buttons{
+    justify-content:center;
+  }
+
+  .photo-area{
+    order:-1;
+  }
+
+  .profile{
+    width:min(290px,78vw);
+  }
+
+  .grid{
+    grid-template-columns:1fr!important;
+  }
+
+  .card{
+    padding:21px;
+    border-radius:21px;
+  }
+
+}
+
+/* small phones */
+
+@media(max-width:480px){
+
+  h1{
+    font-size:42px!important;
+  }
+
+  .hero h2{
+    font-size:20px;
+  }
+
+  .title{
+    font-size:28px;
+  }
+
+  .btn{
+    width:100%;
+    text-align:center;
+  }
+
+}
+</style>
+
 </head>
 
 <body>
@@ -1365,29 +1734,50 @@ async function loadServerData(){
 
 function mergeData(saved){
 
-let result=clone(DEFAULT);
+  const result = clone(DEFAULT);
 
-Object.keys(saved||{}).forEach(key=>{
+  if(
+    !saved ||
+    typeof saved !== "object" ||
+    Array.isArray(saved)
+  ){
+    return result;
+  }
 
-if(
-saved[key] &&
-typeof saved[key]==="object" &&
-!Array.isArray(saved[key]) &&
-typeof result[key]==="object"
-){
+  Object.keys(saved).forEach(key => {
 
-result[key]=Object.assign(result[key],saved[key]);
+    const savedValue = saved[key];
 
-}else{
+    /*
+      Object fields such as links are merged.
+    */
+    if(
+      savedValue &&
+      typeof savedValue === "object" &&
+      !Array.isArray(savedValue) &&
+      result[key] &&
+      typeof result[key] === "object" &&
+      !Array.isArray(result[key])
+    ){
 
-result[key]=saved[key];
+      result[key] = {
+        ...result[key],
+        ...savedValue
+      };
 
-}
+    }else{
 
-});
+      /*
+        Strings, arrays and other primitive values
+        replace the default value directly.
+      */
+      result[key] = savedValue;
 
-return result;
+    }
 
+  });
+
+  return result;
 }
 
 
@@ -1520,23 +1910,45 @@ async function imageURL(key){
     return "";
   }
 
-  // Server-uploaded image
-  if(
-    typeof key === "string" &&
-    !key.startsWith("data:") &&
-    !key.startsWith("blob:") &&
-    !key.startsWith("http://") &&
-    !key.startsWith("https://") &&
-    !key.startsWith("/")
-  ){
+  key = String(key).trim();
 
-    return "/uploads/" + encodeURIComponent(key);
-
+  if(!key){
+    return "";
   }
 
-  // Already a complete URL/path
-  return key;
+  /*
+    Supabase Storage absolute URL
+    http/https URLs are already usable.
+  */
+  if(
+    key.startsWith("https://") ||
+    key.startsWith("http://")
+  ){
+    return key;
+  }
 
+  /*
+    Data/blob URLs are already usable.
+  */
+  if(
+    key.startsWith("data:") ||
+    key.startsWith("blob:")
+  ){
+    return key;
+  }
+
+  /*
+    Existing absolute/local paths.
+  */
+  if(key.startsWith("/")){
+    return key;
+  }
+
+  /*
+    Backward compatibility:
+    old locally stored image filename.
+  */
+  return "/uploads/" + encodeURIComponent(key);
 }
 
 /* RENDER */
